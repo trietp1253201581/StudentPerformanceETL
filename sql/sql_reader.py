@@ -51,7 +51,7 @@ def unit_check() -> None:
         sql_file_path = os.path.join(curr_dir, 'queries.sql')
         sqlFileReader.read(sql_file_path=sql_file_path)
         print(sqlFileReader.get_enable_queries())
-        print(sqlFileReader.get_query_of('SELECT1'))
+        print(sqlFileReader.get_query_of('INSERT A NEW RECORD'))
     except Exception as ioException:
         print(ioException)
 

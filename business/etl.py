@@ -1,16 +1,19 @@
 import os
 import pandas as pd
 import numpy as np
-from model import StudentModel, create_model
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
+from model import create_model
 from opendatasets import download_kaggle_dataset
 from field import FieldName
+from dao import StudentPerformanceDAO, DAOException
 
 dataset_url = 'https://www.kaggle.com/datasets/souradippal/student-performance-prediction'
-data_dir = 'etl/data'
+data_dir = 'business/data'
 file_dir = data_dir + '/student-performance-prediction/student_performance_prediction.csv'
 
 def extract() -> pd.DataFrame:
-    os.environ['KAGGLE_CONFIG_DIR'] = 'etl'
+    os.environ['KAGGLE_CONFIG_DIR'] = 'business'
     download_kaggle_dataset(
         dataset_url=dataset_url,
         data_dir=data_dir,
@@ -36,19 +39,16 @@ def transform(raw_df: pd.DataFrame) -> pd.DataFrame:
                FieldName.PARENT_EDU_LEVEL: 'Unknown'}, inplace=True)
     return df  
 
-if __name__ == '__main__':
+def load(modified_df: pd.DataFrame):
+    models = modified_df.apply(create_model, axis=1).values
+    spDAO = StudentPerformanceDAO('localhost', 'student_performance_etl', 'root', 'Asensio1234@')
+    for model in models:
+        try:
+            spDAO.insert(model)
+        except DAOException as e:
+            print(e)
+            
+def full_process():
     raw_df = extract()
     modified_df = transform(raw_df)
-    print(raw_df.head(5))
-    print(modified_df.head(5))
-    print(modified_df.isna().sum())
-    model = create_model(modified_df.iloc[0])
-    print(model.attendance_rate)
-    models = modified_df.apply(create_model, axis=1)
-    print(models.values[10])
-
-
-
-
-
-    
+    load(modified_df)

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import Literal
 from field import FieldName
+
 class StudentModel:
     def __init__(self, id: str, 
                  study_hours_per_week: float, 
