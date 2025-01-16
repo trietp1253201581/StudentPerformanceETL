@@ -1,54 +1,170 @@
 import os
-import pandas as pd
-import numpy as np
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-from model import create_model
+
+import time
+from typing import Literal
+import pandas as pd
+import numpy as np
 from opendatasets import download_kaggle_dataset
+
+from model import create_model
 from field import FieldName
-from dao import StudentPerformanceDAO, DAOException
+from dao import StudentPerformanceDAO, DAOException, NotExistDataException
 
 dataset_url = 'https://www.kaggle.com/datasets/souradippal/student-performance-prediction'
 data_dir = 'business/data'
 file_dir = data_dir + '/student-performance-prediction/student_performance_prediction.csv'
 
 def extract() -> pd.DataFrame:
+    """
+    Tải và đọc dữ liệu từ Kaggle dataset.
+
+    Returns:
+        pd.DataFrame: Dữ liệu thô từ file CSV.
+
+    Raises:
+        Exception: Nếu có lỗi xảy ra trong quá trình tải dữ liệu.
+    """
     os.environ['KAGGLE_CONFIG_DIR'] = 'business'
+    start_time = time.time()
+    
     download_kaggle_dataset(
         dataset_url=dataset_url,
         data_dir=data_dir,
+        force=True
     )
     raw_df = pd.read_csv(file_dir)
+    
+    end_time = time.time()
+    msg = f'Successfully extract: {len(raw_df)} records. Elapsed Time: {end_time-start_time:.4f}s'
+    print(msg)
     return raw_df
 
 def transform(raw_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Chuyển đổi dữ liệu thô thành dữ liệu đã được xử lý.
+
+    Args:
+        raw_df (pd.DataFrame): Dữ liệu thô.
+
+    Returns:
+        pd.DataFrame: Dữ liệu đã được xử lý.
+
+    Raises:
+        Exception: Nếu có lỗi xảy ra trong quá trình chuyển đổi dữ liệu.
+    """
+    start_time = time.time()
     df = raw_df
-    # Remove NaN in target column
+
+    # Xóa các giá trị NaN trong cột mục tiêu
     df.dropna(subset=[FieldName.PASSED], inplace=True)
     df.reset_index(inplace=True, drop=True)
-    # We will mark missing value or wrong data by np.nan
-    # Study Hours must be non-negative
+
+    # Đánh dấu giá trị bị thiếu hoặc dữ liệu sai bằng np.nan
+    # Giờ học phải là số không âm
     df[FieldName.STUDY_HOURS] = df[FieldName.STUDY_HOURS].apply(lambda x: x if x >= 0 else np.nan)
-    # Attendance rate must be non-negative
+
+    # Tỷ lệ tham gia phải là số không âm
     df[FieldName.ATTENDANCE_RATE] = df[FieldName.ATTENDANCE_RATE].apply(lambda x: x if (x>=0 and x<=100) else np.nan)
-    # Previous grade must be in [0,100]
+
+    # Điểm số trước đó phải trong khoảng [0,100]
     df[FieldName.PREVIOUS_GRADES] = df[FieldName.PREVIOUS_GRADES].clip(0, 100)
     df.fillna({FieldName.PREVIOUS_GRADES: np.nan}, inplace=True)
-    # Fill NaN in categorical features is "Unknown"
+
+    # Điền giá trị NaN trong các đặc trưng phân loại bằng "Unknown"
     df.fillna({FieldName.PARTICIPATE_ON_ACT: 'Unknown',
                FieldName.PARENT_EDU_LEVEL: 'Unknown'}, inplace=True)
+
+    end_time = time.time()
+    msg = f'Successfully transform: {len(df)} records. Elapsed Time: {end_time-start_time:.4f}s'
+    print(msg)
+    
     return df  
 
 def load(modified_df: pd.DataFrame):
+    """
+    Tải dữ liệu đã được xử lý vào cơ sở dữ liệu.
+
+    Args:
+        modified_df (pd.DataFrame): Dữ liệu đã được xử lý.
+
+    Raises:
+        DAOException: Nếu có lỗi xảy ra trong quá trình tải dữ liệu vào cơ sở dữ liệu.
+    """
     models = modified_df.apply(create_model, axis=1).values
     spDAO = StudentPerformanceDAO('localhost', 'student_performance_etl', 'root', 'Asensio1234@')
+    start_time = time.time()
+    update_records = [0, 0]
+    insert_records = [0, 0]
+
+    # Xử lý từng mô hình trong dữ liệu
     for model in models:
         try:
+            spDAO.get(model.id)
+            update_records[0] += 1
+            spDAO.update(model)
+            update_records[1] += 1
+        except NotExistDataException as ne:
+            insert_records[0] += 1
             spDAO.insert(model)
+            insert_records[1] += 1
         except DAOException as e:
-            print(e)
+            print("Failed at ", model.id)
+
+    end_time = time.time()
+    msg = f'Load info: \n'
+    msg += f'\tUpdate Successfully: {update_records[1]}/{update_records[0]}\n'
+    msg += f'\tInsert Successfully: {insert_records[1]}/{insert_records[0]}\n'
+    msg += f'Elapsed Time: {end_time-start_time:.4f}s'
+    print(msg)
+    spDAO.close()
+    
+def reset():
+    """
+    Xóa tất cả các bản ghi trong cơ sở dữ liệu.
+
+    Raises:
+        DAOException: Nếu có lỗi xảy ra trong quá trình xóa dữ liệu.
+    """
+    spDAO = StudentPerformanceDAO('localhost', 'student_performance_etl', 'root', 'Asensio1234@')
+    try:
+        spDAO.delete_all()
+        print('Successfully reset!')
+    except DAOException as e:
+        print(e)
+    
             
-def full_process():
+def full_process(load_for: int|None = None, 
+                 strategy: Literal['head', 'tail', 'random']|None = 'head',
+                 need_reset: bool = False):
+    """
+    Thực hiện quá trình ETL (Extract, Transform, Load) hoàn chỉnh.
+
+    Args:
+        load_for (int|None): Số lượng bản ghi cần tải vào cơ sở dữ liệu, mặc định là None
+        strategy (Literal['head', 'tail', 'random']|None): Chính sách để lấy các bản ghi, mặc định là 'head'
+        need_reset (bool): Yêu cầu reset lại các bản ghi trong CSDL (tức là xóa tất cả), mặc định là False
+    Raises:
+        Exception: Nếu có lỗi xảy ra trong quá trình ETL.
+    """
+    # Extract
     raw_df = extract()
+    
+    # Transform
     modified_df = transform(raw_df)
+    
+    # Load
+    # Check reset 
+    if need_reset:
+        reset()
+    # Check strategy
+    if isinstance(load_for, int):
+        if strategy == 'head':
+            modified_df = modified_df.head(load_for)
+        elif strategy == 'tail':
+            modified_df = modified_df.tail(load_for)
+        elif strategy == 'random':
+            modified_df = modified_df.sample(load_for, random_state=42)
+        
     load(modified_df)

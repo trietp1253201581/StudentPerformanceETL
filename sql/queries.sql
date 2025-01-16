@@ -13,11 +13,10 @@ SELECT * FROM student_performance
 WHERE student_id = %s;
 
 --UPDATE A RECORD
-UPDATE student_performance SET study_hours_per_week = %s 
+UPDATE student_performance SET study_hours_per_week = %s, 
 attendance_rate = %s, previous_grades = %s, participate_in_act = %s,
 parent_edu_level = %s, passed = %s
 WHERE student_id = %s;
 
---DELETE A RECORD
-DELETE student_performance
-WHERE student_id = %s;
+--DELETE ALL
+DELETE FROM student_performance;
