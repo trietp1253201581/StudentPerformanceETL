@@ -6,13 +6,20 @@ import time
 from typing import Literal
 import pandas as pd
 import numpy as np
-from opendatasets import download_kaggle_dataset
+from kaggle.api.kaggle_api_extended import KaggleApi
 
 from model import create_model
 from field import FieldName
 from dao import StudentPerformanceDAO, DAOException, NotExistDataException
 
-dataset_url = 'https://www.kaggle.com/datasets/souradippal/student-performance-prediction'
+import logging
+# Thiết lập config cho log
+logging.basicConfig(filename='business/etl_log.log', level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+
+dataset_id = 'souradippal/student-performance-prediction'
 data_dir = 'business/data'
 file_dir = data_dir + '/student-performance-prediction/student_performance_prediction.csv'
 
@@ -26,19 +33,32 @@ def extract() -> pd.DataFrame:
     Raises:
         Exception: Nếu có lỗi xảy ra trong quá trình tải dữ liệu.
     """
-    os.environ['KAGGLE_CONFIG_DIR'] = 'business'
+    logging.info('Extracting data...')
+    os.environ['KAGGLE_CONFIG_DIR'] = '~/.kaggle'
+    # Xác thực và tải dataset từ Kaggle 
+    kaggle_api = KaggleApi()
+    try:
+        kaggle_api.authenticate()
+        logging.info('Successfully authenticate Kaggle API.')
+    except Exception as e:
+        logging.error(f"Failed to authenticate Kaggle API.")
+        raise e
+    
     start_time = time.time()
     
-    download_kaggle_dataset(
-        dataset_url=dataset_url,
-        data_dir=data_dir,
-        force=True
-    )
+    #Tải
+    try:
+        kaggle_api.dataset_download_files(dataset_id, data_dir, force=True, unzip=True)
+        logging.info(f"Dataset downloaded successfully from {dataset_id}.")
+    except Exception as e:
+        logging.error(f'Failed to download datasets at {dataset_id}.')
+        raise e
     raw_df = pd.read_csv(file_dir)
     
     end_time = time.time()
     msg = f'Successfully extract: {len(raw_df)} records. Elapsed Time: {end_time-start_time:.4f}s'
     print(msg)
+    logging.info(msg)
     return raw_df
 
 def transform(raw_df: pd.DataFrame) -> pd.DataFrame:
@@ -54,6 +74,7 @@ def transform(raw_df: pd.DataFrame) -> pd.DataFrame:
     Raises:
         Exception: Nếu có lỗi xảy ra trong quá trình chuyển đổi dữ liệu.
     """
+    logging.info('Transforming...')
     start_time = time.time()
     df = raw_df
 
@@ -79,6 +100,7 @@ def transform(raw_df: pd.DataFrame) -> pd.DataFrame:
     end_time = time.time()
     msg = f'Successfully transform: {len(df)} records. Elapsed Time: {end_time-start_time:.4f}s'
     print(msg)
+    logging.info(msg)
     
     return df  
 
@@ -92,6 +114,7 @@ def load(modified_df: pd.DataFrame):
     Raises:
         DAOException: Nếu có lỗi xảy ra trong quá trình tải dữ liệu vào cơ sở dữ liệu.
     """
+    logging.info('Loading data...')
     models = modified_df.apply(create_model, axis=1).values
     spDAO = StudentPerformanceDAO('localhost', 'student_performance_etl', 'root', 'Asensio1234@')
     start_time = time.time()
@@ -111,6 +134,7 @@ def load(modified_df: pd.DataFrame):
             insert_records[1] += 1
         except DAOException as e:
             print("Failed at ", model.id)
+            logging.error(f'Failed at {model.id}')
 
     end_time = time.time()
     msg = f'Load info: \n'
@@ -118,6 +142,7 @@ def load(modified_df: pd.DataFrame):
     msg += f'\tInsert Successfully: {insert_records[1]}/{insert_records[0]}\n'
     msg += f'Elapsed Time: {end_time-start_time:.4f}s'
     print(msg)
+    logging.info(msg)
     spDAO.close()
     
 def reset():
@@ -131,11 +156,13 @@ def reset():
     try:
         spDAO.delete_all()
         print('Successfully reset!')
+        logging.info('Reset data...')
     except DAOException as e:
         print(e)
+        logging.error('Error when reset!')
     
             
-def full_process(load_for: int|None = None, 
+def etl_process(load_for: int|None = None, 
                  strategy: Literal['head', 'tail', 'random']|None = 'head',
                  need_reset: bool = False):
     """

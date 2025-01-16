@@ -1,0 +1,108 @@
+2025-01-16 21:47:42 - DEBUG - Running job Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})
+2025-01-16 21:47:42 - INFO - <<Job 1>>
+2025-01-16 21:47:42 - INFO - Extracting data...
+2025-01-16 21:47:42 - INFO - Successfully authenticate Kaggle API.
+2025-01-16 21:47:45 - INFO - Dataset downloaded successfully from souradippal/student-performance-prediction.
+2025-01-16 21:47:45 - INFO - Successfully extract: 40000 records. Elapsed Time: 3.5673s
+2025-01-16 21:47:45 - INFO - Transforming...
+2025-01-16 21:47:45 - INFO - Successfully transform: 38000 records. Elapsed Time: 0.1104s
+2025-01-16 21:47:45 - INFO - Loading data...
+2025-01-16 21:47:46 - DEBUG - Building SSL context
+2025-01-16 21:47:46 - DEBUG - Switching to SSL
+2025-01-16 21:47:46 - DEBUG - SSL has been enabled
+2025-01-16 21:47:46 - DEBUG - Starting authorization phase
+2025-01-16 21:47:46 - DEBUG - The provided initial strategy is caching_sha2_password
+2025-01-16 21:47:46 - INFO - package: mysql.connector.plugins
+2025-01-16 21:47:46 - INFO - plugin_name: caching_sha2_password
+2025-01-16 21:47:46 - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLCachingSHA2PasswordAuthPlugin
+2025-01-16 21:47:46 - DEBUG - Exchanging further packets
+2025-01-16 21:47:46 - DEBUG - caching_sha2_password completed succesfully
+2025-01-16 21:48:07 - INFO - Load info: 
+	Update Successfully: 116/116
+	Insert Successfully: 1884/1884
+Elapsed Time: 20.9409s
+2025-01-16 21:49:07 - DEBUG - Running job Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})
+2025-01-16 21:49:07 - INFO - <<Job 2>>
+2025-01-16 21:49:07 - INFO - Extracting data...
+2025-01-16 21:49:07 - INFO - Successfully authenticate Kaggle API.
+2025-01-16 21:49:10 - INFO - Dataset downloaded successfully from souradippal/student-performance-prediction.
+2025-01-16 21:49:11 - INFO - Successfully extract: 40000 records. Elapsed Time: 3.6006s
+2025-01-16 21:49:11 - INFO - Transforming...
+2025-01-16 21:49:11 - INFO - Successfully transform: 38000 records. Elapsed Time: 0.1213s
+2025-01-16 21:49:11 - INFO - Loading data...
+2025-01-16 21:49:11 - DEBUG - Building SSL context
+2025-01-16 21:49:11 - DEBUG - Switching to SSL
+2025-01-16 21:49:11 - DEBUG - SSL has been enabled
+2025-01-16 21:49:11 - DEBUG - Starting authorization phase
+2025-01-16 21:49:11 - DEBUG - The provided initial strategy is caching_sha2_password
+2025-01-16 21:49:11 - DEBUG - Exchanging further packets
+2025-01-16 21:49:11 - DEBUG - caching_sha2_password completed succesfully
+2025-01-16 21:49:20 - INFO - Load info: 
+	Update Successfully: 2000/2000
+	Insert Successfully: 0/0
+Elapsed Time: 8.4676s
+2025-01-16 21:50:20 - DEBUG - Running job Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})
+2025-01-16 21:50:20 - INFO - <<Job 3>>
+2025-01-16 21:50:20 - INFO - Extracting data...
+2025-01-16 21:50:20 - INFO - Successfully authenticate Kaggle API.
+2025-01-16 21:50:23 - INFO - Dataset downloaded successfully from souradippal/student-performance-prediction.
+2025-01-16 21:50:23 - INFO - Successfully extract: 40000 records. Elapsed Time: 3.4779s
+2025-01-16 21:50:23 - INFO - Transforming...
+2025-01-16 21:50:23 - INFO - Successfully transform: 38000 records. Elapsed Time: 0.1818s
+2025-01-16 21:50:23 - INFO - Loading data...
+2025-01-16 21:50:23 - DEBUG - Building SSL context
+2025-01-16 21:50:24 - DEBUG - Switching to SSL
+2025-01-16 21:50:24 - DEBUG - SSL has been enabled
+2025-01-16 21:50:24 - DEBUG - Starting authorization phase
+2025-01-16 21:50:24 - DEBUG - The provided initial strategy is caching_sha2_password
+2025-01-16 21:50:24 - DEBUG - Exchanging further packets
+2025-01-16 21:50:24 - DEBUG - caching_sha2_password completed succesfully
+2025-01-16 21:50:33 - INFO - Load info: 
+	Update Successfully: 2000/2000
+	Insert Successfully: 0/0
+Elapsed Time: 9.0302s
+2025-01-16 21:51:33 - DEBUG - Running job Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})
+2025-01-16 21:51:33 - INFO - <<Job 4>>
+2025-01-16 21:51:33 - INFO - Extracting data...
+2025-01-16 21:51:33 - INFO - Successfully authenticate Kaggle API.
+2025-01-16 21:51:36 - INFO - Dataset downloaded successfully from souradippal/student-performance-prediction.
+2025-01-16 21:51:36 - INFO - Successfully extract: 40000 records. Elapsed Time: 3.3374s
+2025-01-16 21:51:36 - INFO - Transforming...
+2025-01-16 21:51:36 - INFO - Successfully transform: 38000 records. Elapsed Time: 0.0981s
+2025-01-16 21:51:36 - INFO - Loading data...
+2025-01-16 21:51:36 - DEBUG - Building SSL context
+2025-01-16 21:51:36 - DEBUG - Switching to SSL
+2025-01-16 21:51:36 - DEBUG - SSL has been enabled
+2025-01-16 21:51:36 - DEBUG - Starting authorization phase
+2025-01-16 21:51:36 - DEBUG - The provided initial strategy is caching_sha2_password
+2025-01-16 21:51:36 - DEBUG - Exchanging further packets
+2025-01-16 21:51:36 - DEBUG - caching_sha2_password completed succesfully
+2025-01-16 21:51:45 - INFO - Load info: 
+	Update Successfully: 2000/2000
+	Insert Successfully: 0/0
+Elapsed Time: 8.2496s
+2025-01-16 21:52:45 - DEBUG - Running job Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})
+2025-01-16 21:52:45 - INFO - <<Job 5>>
+2025-01-16 21:52:45 - INFO - Extracting data...
+2025-01-16 21:52:45 - INFO - Successfully authenticate Kaggle API.
+2025-01-16 21:52:48 - INFO - Dataset downloaded successfully from souradippal/student-performance-prediction.
+2025-01-16 21:52:48 - INFO - Successfully extract: 40000 records. Elapsed Time: 3.4171s
+2025-01-16 21:52:48 - INFO - Transforming...
+2025-01-16 21:52:48 - INFO - Successfully transform: 38000 records. Elapsed Time: 0.1088s
+2025-01-16 21:52:48 - INFO - Loading data...
+2025-01-16 21:52:48 - DEBUG - Building SSL context
+2025-01-16 21:52:49 - DEBUG - Switching to SSL
+2025-01-16 21:52:49 - DEBUG - SSL has been enabled
+2025-01-16 21:52:49 - DEBUG - Starting authorization phase
+2025-01-16 21:52:49 - DEBUG - The provided initial strategy is caching_sha2_password
+2025-01-16 21:52:49 - DEBUG - Exchanging further packets
+2025-01-16 21:52:49 - DEBUG - caching_sha2_password completed succesfully
+2025-01-16 21:52:57 - INFO - Load info: 
+	Update Successfully: 2000/2000
+	Insert Successfully: 0/0
+Elapsed Time: 8.4477s
+2025-01-16 21:52:57 - INFO - Execution count has reached 5. Cancelling the job.
+2025-01-16 21:52:57 - DEBUG - Cancelling job "Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})"
+2025-01-16 21:52:58 - DEBUG - Cancelling job "Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})"
+2025-01-16 21:52:58 - DEBUG - Cancelling not-scheduled job "Job(interval=1, unit=minutes, do=<lambda>, args=(), kwargs={})"
+2025-01-16 21:52:58 - INFO - Done!!!
